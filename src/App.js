@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import "./App.css";
 import "./bootstrap-min.css";
 import _ from "lodash";
+import PropTypes from "prop-types";
+import { BrowserRouter, Route, Link } from "react-router-dom";
 
 const Header = props => {
   return (
@@ -14,28 +16,35 @@ const Header = props => {
   );
 };
 
-const Turn = props => {
-  const bgColor = highlighter => {
-    const colors = { none: "white", correct: "green", incorrect: "red" };
-    return colors[bgColor];
-  };
+const Book = props => {
+  return (
+    <div className="answer" onClick={() => props.onAnswerSelected(props.title)}>
+      <h4>{props.title}</h4>
+    </div>
+  );
+};
 
-  const Book = props => {
-    return (
-      <div className="answer">
-        <h4>{props.title}</h4>
-      </div>
-    );
+const Turn = props => {
+  const highlightColor = highlighter => {
+    const colors = { none: "white", correct: "green", incorrect: "red" };
+    return colors[highlighter];
   };
 
   return (
-    <div className="row turn" style={{ backgroundColor: "white" }}>
+    <div
+      className="row turn"
+      style={{ backgroundColor: highlightColor(props.highlighter) }}
+    >
       <div className="col-4 offset-1">
         <img src={props.author.imageUrl} className="authorimage" alt="Author" />
       </div>
       <div className="col-6">
         {props.books.map(title => (
-          <Book key={title} title={title} />
+          <Book
+            key={title}
+            title={title}
+            onAnswerSelected={props.onAnswerSelected}
+          />
         ))}
       </div>
     </div>
@@ -92,7 +101,7 @@ const authors = [
   {
     name: "Charles Dickens",
     imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/d/db/Charles_Dickens_by_Ary_Scheffer_1855.jpgimages/authors/charlesdickens.jpg",
+      "https://upload.wikimedia.org/wikipedia/commons/d/db/Charles_Dickens_by_Ary_Scheffer_1855.jpg",
     imageSource: "Wikimedia Commons",
     books: ["David Copperfield", "A Tale of Two Cities"]
   },
@@ -105,7 +114,7 @@ const authors = [
   }
 ];
 
-const turnData = () => {
+const turnData = authors => {
   const allBooks = authors.reduce(function(p, c, i) {
     return p.concat(c.books);
   }, []);
@@ -118,38 +127,81 @@ const turnData = () => {
   };
 };
 
-class Game extends Component {
+class AuthorQuiz extends Component {
   constructor() {
     super();
-    this.state = Game.initialState();
+    this.state = AuthorQuiz.initialState();
   }
 
   static initialState = () => ({
-    turnData: turnData
+    turnData: turnData(authors),
+    highlighter: ""
   });
 
   resetGame = () => {
-    this.setState(Game.initialState());
+    this.setState(AuthorQuiz.initialState());
+  };
+
+  onAnswerSelected = answer => {
+    const isCorrect = this.state.turnData.author.books.some(
+      book => book === answer
+    );
+    this.setState({
+      highlighter: isCorrect ? "correct" : "incorrect"
+    });
   };
 
   render() {
     return (
       <div className="container-fluid">
         <Header />
-        <Turn {...this.state.turnData} />
+        <Turn
+          {...this.state.turnData}
+          highlighter={this.state.highlighter}
+          onAnswerSelected={this.onAnswerSelected}
+        />
         <Continue />
+        <p>
+          <Link to="/add">Add an Author</Link>
+        </p>
         <Footer />
       </div>
     );
   }
 }
 
+AuthorQuiz.PropTypes = {
+  turnData: PropTypes.shape({
+    books: PropTypes.arrayOf(PropTypes.string).isRequired,
+    author: PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      imageUrl: PropTypes.string.isRequired,
+      imageSource: PropTypes.string.isRequired,
+      books: PropTypes.arrayOf(PropTypes.string).isRequired
+    })
+  }),
+  highlighter: PropTypes.string.isRequired,
+  onAnswerSelected: PropTypes.func.isRequired
+};
+
+const AuthorForm = ({ match }) => {
+  return (
+    <div>
+      <h1>Add Author</h1>
+      <p>{JSON.stringify(match)}</p>
+    </div>
+  );
+};
+
 export default class App extends Component {
   render() {
     return (
-      <div className="App">
-        <Game />
-      </div>
+      <BrowserRouter>
+        <React.Fragment>
+          <Route exact path="/" component={AuthorQuiz} />
+          <Route exact path="/add" component={AuthorForm} />
+        </React.Fragment>
+      </BrowserRouter>
     );
   }
 }
