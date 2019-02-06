@@ -30,3 +30,17 @@
     transform: rotate(360deg);
   }
 }
+
+.authorimage {
+  max-height: 100%;
+  max-width: 100%;
+}
+
+.answer {
+  background-color: #96aec4;
+  border-color: #061f30;
+  margin-bottom: 20px;
+  padding: 15px 30px 15px 15px;
+  border-left: 5px solid #05090c;
+  cursor: pointer;
+}
