@@ -52,13 +52,34 @@ const Turn = props => {
 };
 
 const Continue = props => {
-  return <div />;
+  return (
+    <div className="row continue">
+      {props.show ? (
+        <div className="col-11">
+          <button
+            className="btn btn-primary btn-lg float-right"
+            onClick={props.onContinue}
+          >
+            Continue
+          </button>
+        </div>
+      ) : null}
+    </div>
+  );
+};
+
+const AddLink = props => {
+  return (
+    <div className="col-12 offset-1">
+      <Link to="/add">Add an Author</Link>
+    </div>
+  );
 };
 
 const Footer = props => {
   return (
     <div className="row">
-      <div className="col-12">
+      <div className="col-12 offset-3">
         <p className="text-muted credit">
           All images are from{" "}
           <a href="https://commons.wikimedia.org/wiki">Wikemedia Commons</a> and
@@ -138,7 +159,7 @@ class AuthorQuiz extends Component {
     highlighter: ""
   });
 
-  resetGame = () => {
+  resetState = () => {
     this.setState(AuthorQuiz.initialState());
   };
 
@@ -160,10 +181,11 @@ class AuthorQuiz extends Component {
           highlighter={this.state.highlighter}
           onAnswerSelected={this.onAnswerSelected}
         />
-        <Continue />
-        <p>
-          <Link to="/add">Add an Author</Link>
-        </p>
+        <Continue
+          show={this.state.highlighter === "correct"}
+          onContinue={this.resetState}
+        />
+        <AddLink />
         <Footer />
       </div>
     );
@@ -184,22 +206,71 @@ AuthorQuiz.PropTypes = {
   onAnswerSelected: PropTypes.func.isRequired
 };
 
-const AuthorForm = ({ match }) => {
-  return (
-    <div>
-      <h1>Add Author</h1>
-      <p>{JSON.stringify(match)}</p>
-    </div>
-  );
-};
+class AuthorForm extends Component {
+  constructor(props) {
+    super(props);
+    this.state = AuthorForm.initialState();
+    this.onFieldChange = this.onFieldChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  static initialState = () => ({
+    name: "",
+    imageUrl: ""
+  });
+
+  onFieldChange = event => {
+    this.setState({
+      [event.target.name]: event.target.value
+    });
+  };
+
+  handleSubmit = event => {
+    event.preventDefault();
+    console.log(event);
+  };
+
+  render() {
+    return (
+      <div className="AddAuthorForm">
+        <h1>Add Author</h1>
+        <form onSubmit={this.handleSubmit}>
+          <div className="AddAuthorForm_Input">
+            <label htmlFor="name">Name</label>
+            <input
+              type="text"
+              name="name"
+              value={this.state.name}
+              onChange={this.onFieldChange}
+            />
+          </div>
+          <div className="AddAuthorForm_Input">
+            <label htmlFor="imageUrl">Image URL</label>
+            <input
+              type="text"
+              name="imageUrl"
+              value={this.state.imageUrl}
+              onChange={this.onFieldChange}
+            />
+          </div>
+          <input type="submit" value="Add" />
+        </form>
+      </div>
+    );
+  }
+}
 
 export default class App extends Component {
   render() {
     return (
       <BrowserRouter>
         <React.Fragment>
-          <Route exact path="/" component={AuthorQuiz} />
-          <Route exact path="/add" component={AuthorForm} />
+          <Route exact path="/">
+            <AuthorQuiz />
+          </Route>
+          {/* <Route exact path="/add">
+            <AuthorForm />
+          </Route> */}
         </React.Fragment>
       </BrowserRouter>
     );

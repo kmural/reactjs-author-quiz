@@ -44,3 +44,21 @@
   border-left: 5px solid #05090c;
   cursor: pointer;
 }
+
+.AddAuthorForm {
+  width: 80%;
+  margin: 50px 10%;
+}
+
+.AddAuthorForm_Input {
+  margin-bottom: 20px;
+}
+
+.AddAuthorForm_Input > label {
+  display: block;
+}
+
+.continue {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
