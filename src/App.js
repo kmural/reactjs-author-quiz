@@ -3,7 +3,7 @@ import "./App.css";
 import "./bootstrap-min.css";
 import _ from "lodash";
 import PropTypes from "prop-types";
-import { BrowserRouter, Route, Link } from "react-router-dom";
+import { BrowserRouter, Route } from "react-router-dom";
 
 const Header = props => {
   return (
@@ -64,14 +64,6 @@ const Continue = props => {
           </button>
         </div>
       ) : null}
-    </div>
-  );
-};
-
-const AddLink = props => {
-  return (
-    <div className="col-12 offset-1">
-      <Link to="/add">Add an Author</Link>
     </div>
   );
 };
@@ -185,7 +177,6 @@ class AuthorQuiz extends Component {
           show={this.state.highlighter === "correct"}
           onContinue={this.resetState}
         />
-        <AddLink />
         <Footer />
       </div>
     );
@@ -206,60 +197,6 @@ AuthorQuiz.PropTypes = {
   onAnswerSelected: PropTypes.func.isRequired
 };
 
-class AuthorForm extends Component {
-  constructor(props) {
-    super(props);
-    this.state = AuthorForm.initialState();
-    this.onFieldChange = this.onFieldChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-  }
-
-  static initialState = () => ({
-    name: "",
-    imageUrl: ""
-  });
-
-  onFieldChange = event => {
-    this.setState({
-      [event.target.name]: event.target.value
-    });
-  };
-
-  handleSubmit = event => {
-    event.preventDefault();
-    console.log(event);
-  };
-
-  render() {
-    return (
-      <div className="AddAuthorForm">
-        <h1>Add Author</h1>
-        <form onSubmit={this.handleSubmit}>
-          <div className="AddAuthorForm_Input">
-            <label htmlFor="name">Name</label>
-            <input
-              type="text"
-              name="name"
-              value={this.state.name}
-              onChange={this.onFieldChange}
-            />
-          </div>
-          <div className="AddAuthorForm_Input">
-            <label htmlFor="imageUrl">Image URL</label>
-            <input
-              type="text"
-              name="imageUrl"
-              value={this.state.imageUrl}
-              onChange={this.onFieldChange}
-            />
-          </div>
-          <input type="submit" value="Add" />
-        </form>
-      </div>
-    );
-  }
-}
-
 export default class App extends Component {
   render() {
     return (
@@ -268,9 +205,6 @@ export default class App extends Component {
           <Route exact path="/">
             <AuthorQuiz />
           </Route>
-          {/* <Route exact path="/add">
-            <AuthorForm />
-          </Route> */}
         </React.Fragment>
       </BrowserRouter>
     );
